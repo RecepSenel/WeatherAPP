@@ -24,7 +24,6 @@ public class WeatherService {
 
     private final WeatherRepository weatherRepository;
     private final RestTemplate restTemplate;
-   // private final ObjectMapper objectMapper = new ObjectMapper();
 
     public WeatherService(WeatherRepository repository, RestTemplate restTemplate){
         this.weatherRepository = repository;
@@ -42,26 +41,13 @@ public class WeatherService {
             return getWeatherByWeatherStack(city).map(WeatherDto::convert).get();
         }
 
-        /*
-        return (WeatherDto) weatherModel.map(model -> {
-            if (model.getLocalDateTime().isBefore(LocalDateTime.now().minusMinutes(30))) {
-                return getWeatherByWeatherStack(city).map(WeatherDto::convert);
-            } else {
-                return WeatherDto.convert(model);
-            }
-        }).orElseGet(() -> getWeatherByWeatherStack(city).map(WeatherDto::convert));
-
-         */
-
     }
 
     public Optional<WeatherModel> getWeatherByWeatherStack(String city){
 
-     //   ResponseEntity<String> result = restTemplate.getForEntity(createUrl(city), String.class);
         ResponseData result = restTemplate.getForObject(createUrl(city), ResponseData.class);
 
         if(result != null){
-            // ResponseData response = objectMapper.readValue(result.getBody(), ResponseData.class);
             return Optional.of(saveWeatherModel(result));
         }
         return Optional.empty();
