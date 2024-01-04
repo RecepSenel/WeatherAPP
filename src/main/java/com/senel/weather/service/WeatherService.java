@@ -1,14 +1,11 @@
 package com.senel.weather.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.senel.weather.constants.Constants;
 import com.senel.weather.data.ResponseData;
 import com.senel.weather.dto.WeatherDto;
 import com.senel.weather.model.WeatherModel;
 import com.senel.weather.repository.WeatherRepository;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -22,6 +19,7 @@ import static com.senel.weather.constants.Constants.*;
 @Service
 public class WeatherService {
 
+    private final Logger logger = LoggerFactory.getLogger(WeatherService.class);
     private final WeatherRepository weatherRepository;
     private final RestTemplate restTemplate;
 
@@ -44,13 +42,10 @@ public class WeatherService {
     }
 
     public Optional<WeatherModel> getWeatherByWeatherStack(String city){
-
         ResponseData result = restTemplate.getForObject(createUrl(city), ResponseData.class);
 
-        if(result != null){
-            return Optional.of(saveWeatherModel(result));
-        }
-        return Optional.empty();
+        return result != null ? Optional.of(saveWeatherModel(result)) : Optional.empty();
+
     }
 
     private WeatherModel saveWeatherModel(ResponseData responseData){
@@ -65,6 +60,7 @@ public class WeatherService {
     }
 
     public String createUrl(String city){
-       return API_URL + ACCESS_KEY + API_KEY + QUERY + city;
+       return API_URL+ ACCESS_KEY + API_KEY + QUERY + city;
     }
+
 }
