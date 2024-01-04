@@ -43,7 +43,7 @@ public class WeatherController {
 
     public ResponseEntity<String> rateLimiterFallback(String city, Exception ex){
         logger.info("Ratelimiter Aufruf!");
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Das sind zu viele Aufrufe!");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 
 }
