@@ -4,8 +4,14 @@ import com.senel.weather.data.ResponseData;
 import com.senel.weather.dto.WeatherDto;
 import com.senel.weather.model.WeatherModel;
 import com.senel.weather.repository.WeatherRepository;
+import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -17,6 +23,7 @@ import java.util.Optional;
 import static com.senel.weather.constants.Constants.*;
 
 @Service
+@CacheConfig(cacheNames = {"weather"})
 public class WeatherService {
 
     private final Logger logger = LoggerFactory.getLogger(WeatherService.class);
@@ -28,7 +35,9 @@ public class WeatherService {
         this.restTemplate = restTemplate;
     }
 
+    @Cacheable(key = "#city")
     public WeatherDto getWeatherByCityName(String city){
+        logger.info("Requested city: {} ", city);
         Optional<WeatherModel> weatherModel = weatherRepository.findFirstByCityNameOrderByTimeDesc(city);
         if(weatherModel.isPresent()){
             if(weatherModel.get().getLocalDateTime().isBefore(LocalDateTime.now().minusMinutes(30))){
@@ -39,6 +48,12 @@ public class WeatherService {
             return getWeatherByWeatherStack(city).map(WeatherDto::convert).get();
         }
 
+    }
+    @CacheEvict(allEntries = true)
+    @PostConstruct
+    @Scheduled(fixedRateString = "1800000")
+    public void clearCache(){
+        logger.info("Cache cleared!");
     }
 
     public Optional<WeatherModel> getWeatherByWeatherStack(String city){

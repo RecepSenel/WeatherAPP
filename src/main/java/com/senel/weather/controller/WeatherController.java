@@ -16,19 +16,23 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/v1/app/weather")
+@RequestMapping("/")
 @Validated
 public class WeatherController {
     private Logger logger = LoggerFactory.getLogger(WeatherController.class);
     private final WeatherService weatherService;
 
     public WeatherController(WeatherService weatherService) {
-
         this.weatherService = weatherService;
     }
 
+    @GetMapping("/public")
+    public String getPublicStuff(){
+        return "PUBLIC STUFF";
+    }
 
-    @GetMapping()
+
+    @GetMapping("weather")
    // @Retry(name = "weather", fallbackMethod = "retryFallback")
     @RateLimiter(name = "weather", fallbackMethod = "rateLimiterFallback")
     public ResponseEntity<WeatherDto> getWeatherByCityName(@RequestParam(name = "city") @CityNameConstraint String city){
