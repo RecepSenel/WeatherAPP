@@ -1,0 +1,30 @@
+keys:
+    secret_key: cgrfnBV0QxtOCOOWtvKypMNe027VFKa3
+    api_key: api_key
+    api_secret: 54745-932Hh-9hGhG-936dh_083Ng
+
+
+server:
+    port: 7070
+
+
+spring:
+    application:
+        name: GATEWAY
+    cloud:
+        gateway:
+            httpserver:
+                wiretap=true:
+            discovery:
+                locator:
+                    enabled: true
+                    lowerCaseServiceId: true
+            routes:
+                - id: USER-SERVICE
+                  uri: http://localhost:8080
+                  predicates:
+                      - Path=/user/**
+            #      filters:
+             #        - AddRequestHeader=api_key,  api_key
+              #       - AddRequestHeader=api_secret,  54745-932Hh-9hGhG-936dh_083Ng
+
